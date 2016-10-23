@@ -113,7 +113,7 @@ rbffi_SetupCallParams(int argc, VALUE* argv, int paramCount, Type** paramTypes,
         Type* paramType = paramTypes[i];
         int type;
 
-        
+
         if (unlikely(paramType->nativeType == NATIVE_MAPPED)) {
             VALUE values[] = { argv[argidx], Qnil };
             argv[argidx] = rb_funcall2(((MappedType *) paramType)->rbConverter, id_to_native, 2, values);
@@ -294,8 +294,8 @@ rbffi_SetupCallParams(int argc, VALUE* argv, int paramCount, Type** paramTypes,
 
             case NATIVE_STRING:
                 if (type == T_NIL) {
-                    param->ptr = NULL; 
-                
+                    param->ptr = NULL;
+
                 } else {
                     if (rb_safe_level() >= 1 && OBJ_TAINTED(argv[argidx])) {
                         rb_raise(rb_eSecurityError, "Unsafe string parameter");
@@ -342,9 +342,13 @@ static VALUE
 call_blocking_function(void* data)
 {
     rbffi_blocking_call_t* b = (rbffi_blocking_call_t *) data;
+#ifndef HAVE_RUBY_THREAD_HAS_GVL_P
     b->frame->has_gvl = false;
+#endif
     ffi_call(&b->cif, FFI_FN(b->function), b->retval, b->ffiValues);
+#ifndef HAVE_RUBY_THREAD_HAS_GVL_P
     b->frame->has_gvl = true;
+#endif
 
     return Qnil;
 }
@@ -373,9 +377,9 @@ rbffi_CallFunction(int argc, VALUE* argv, void* function, FunctionType* fnInfo)
     FFIStorage* params;
     VALUE rbReturnValue;
     rbffi_frame_t frame = { 0 };
-    
+
     retval = alloca(MAX(fnInfo->ffi_cif.rtype->size, FFI_SIZEOF_ARG));
-    
+
     if (unlikely(fnInfo->blocking)) {
         rbffi_blocking_call_t* bc;
 
@@ -405,7 +409,7 @@ rbffi_CallFunction(int argc, VALUE* argv, void* function, FunctionType* fnInfo)
             fnInfo->parameterCount, fnInfo->parameterTypes, params, ffiValues,
             fnInfo->callbackParameters, fnInfo->callbackCount, fnInfo->rbEnums);
 
-        rbffi_frame_push(&frame); 
+        rbffi_frame_push(&frame);
         rb_rescue2(rbffi_do_blocking_call, (VALUE) bc, rbffi_save_frame_exception, (VALUE) &frame, rb_eException, (VALUE) 0);
         rbffi_frame_pop(&frame);
 
@@ -416,7 +420,7 @@ rbffi_CallFunction(int argc, VALUE* argv, void* function, FunctionType* fnInfo)
         xfree(bc->retval);
         xfree(bc);
 #endif
-    
+
     } else {
 
         ffiValues = ALLOCA_N(void *, fnInfo->parameterCount);
@@ -433,7 +437,7 @@ rbffi_CallFunction(int argc, VALUE* argv, void* function, FunctionType* fnInfo)
 
     if (unlikely(!fnInfo->ignoreErrno)) {
         rbffi_save_errno();
-    }    
+    }
 
     if (RTEST(frame.exc) && frame.exc != Qnil) {
         rb_exc_raise(frame.exc);
@@ -441,7 +445,7 @@ rbffi_CallFunction(int argc, VALUE* argv, void* function, FunctionType* fnInfo)
 
     RB_GC_GUARD(rbReturnValue) = rbffi_NativeValue_ToRuby(fnInfo->returnType, fnInfo->rbReturnType, retval);
     RB_GC_GUARD(fnInfo->rbReturnType);
-    
+
     return rbReturnValue;
 }
 
@@ -458,7 +462,7 @@ getPointer(VALUE value, int type)
         return memory != NULL ? memory->address : NULL;
 
     } else if (type == T_STRING) {
-        
+
         return StringValuePtr(value);
 
     } else if (type == T_NIL) {

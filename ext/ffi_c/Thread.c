@@ -69,13 +69,15 @@ rbffi_frame_current(void)
 #endif
 }
 
-void 
+void
 rbffi_frame_push(rbffi_frame_t* frame)
 {
     memset(frame, 0, sizeof(*frame));
+#ifndef HAVE_RUBY_THREAD_HAS_GVL_P
     frame->has_gvl = true;
+#endif
     frame->exc = Qnil;
-    
+
 #ifdef _WIN32
     frame->prev = TlsGetValue(frame_thread_key);
     TlsSetValue(frame_thread_key, frame);
@@ -86,7 +88,7 @@ rbffi_frame_push(rbffi_frame_t* frame)
 #endif
 }
 
-void 
+void
 rbffi_frame_pop(rbffi_frame_t* frame)
 {
 #ifdef _WIN32
@@ -117,13 +119,13 @@ rbffi_blocking_thread(void* args)
     struct BlockingThread* thr = (struct BlockingThread *) args;
     char c = 1;
     VALUE retval;
-    
+
     retval = (*thr->fn)(thr->data);
-    
+
     pthread_testcancel();
 
     thr->retval = retval;
-    
+
     write(thr->wrfd, &c, sizeof(c));
 
     return NULL;
@@ -134,7 +136,7 @@ wait_for_thread(void *data)
 {
     struct BlockingThread* thr = (struct BlockingThread *) data;
     char c;
-    
+
     if (read(thr->rdfd, &c, 1) < 1) {
         rb_thread_wait_fd(thr->rdfd);
         while (read(thr->rdfd, &c, 1) < 1 && rb_io_wait_readable(thr->rdfd) == Qtrue) {
@@ -165,7 +167,7 @@ rbffi_thread_blocking_region(VALUE (*func)(void *), void *data1, void (*ubf)(voi
     struct BlockingThread* thr;
     int fd[2];
     VALUE exc;
-    
+
     if (pipe(fd) < 0) {
         rb_raise(rb_eSystemCallError, "pipe(2) failed");
         return Qnil;
@@ -191,7 +193,7 @@ rbffi_thread_blocking_region(VALUE (*func)(void *), void *data1, void (*ubf)(voi
 
     exc = rb_rescue2(wait_for_thread, (VALUE) thr, cleanup_blocking_thread, (VALUE) thr,
         rb_eException);
-    
+
     pthread_join(thr->tid, NULL);
     close(fd[1]);
     close(fd[0]);
@@ -347,6 +349,6 @@ rbffi_Thread_Init(VALUE moduleFFI)
 #ifdef _WIN32
     frame_thread_key = TlsAlloc();
 #else
-    pthread_key_create(&thread_data_key, thread_data_free);    
+    pthread_key_create(&thread_data_key, thread_data_free);
 #endif
 }

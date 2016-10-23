@@ -11,7 +11,7 @@ if !defined?(RUBY_ENGINE) || RUBY_ENGINE == 'ruby' || RUBY_ENGINE == 'rbx'
   $CFLAGS.gsub!(/[\s+]-std=[^\s]+/, '')
   # solaris 10 needs -c99 for <stdbool.h>
   $CFLAGS << " -std=c99" if RbConfig::CONFIG['host_os'] =~ /solaris(!?2\.11)/
-  
+
   if ENV['RUBY_CC_VERSION'].nil? && (pkg_config("libffi") ||
      have_header("ffi.h") ||
      find_header("ffi.h", "/usr/local/include", "/usr/include/ffi"))
@@ -24,19 +24,21 @@ if !defined?(RUBY_ENGINE) || RUBY_ENGINE == 'ruby' || RUBY_ENGINE == 'rbx'
     # Check if the raw api is available.
     $defs << "-DHAVE_RAW_API" if have_func("ffi_raw_call") && have_func("ffi_prep_raw_closure")
   end
-  
+
   have_func('rb_thread_blocking_region')
   have_func('rb_thread_call_with_gvl')
   have_func('rb_thread_call_without_gvl')
+  have_func('ruby_native_thread_p')
+  have_func('ruby_thread_has_gvl_p')
   have_func('ffi_prep_cif_var')
-  
+
   $defs << "-DHAVE_EXTCONF_H" if $defs.empty? # needed so create_header works
   $defs << "-DUSE_INTERNAL_LIBFFI" unless libffi_ok
   $defs << "-DRUBY_1_9" if RUBY_VERSION >= "1.9.0"
   $defs << "-DFFI_BUILDING" if RbConfig::CONFIG['host_os'] =~ /mswin/ # for compatibility with newer libffi
 
   create_header
-  
+
   $LOCAL_LIBS << " ./libffi/.libs/libffi_convenience.lib" if !libffi_ok && RbConfig::CONFIG['host_os'] =~ /mswin/
 
   create_makefile("ffi_c")
@@ -56,7 +58,7 @@ if !defined?(RUBY_ENGINE) || RUBY_ENGINE == 'ruby' || RUBY_ENGINE == 'rbx'
       end
     end
   end
-  
+
 else
   File.open("Makefile", "w") do |mf|
     mf.puts "# Dummy makefile for non-mri rubies"
