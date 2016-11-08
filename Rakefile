@@ -172,7 +172,7 @@ if USE_RAKE_COMPILER
     # ext.lib_dir = BUILD_DIR                                 # put binaries into this folder.
     ext.tmp_dir = BUILD_DIR                                   # temporary folder used during compilation.
     ext.cross_compile = true                                  # enable cross compilation (requires cross compile toolchain)
-    ext.cross_platform = %w[i386-mingw32 x64-mingw32]                     # forces the Windows platform instead of the default one
+    ext.cross_platform = %w[i386-mingw32 x64-mingw32 x86-linux x86_64-linux]
   end
 
   ENV['RUBY_CC_VERSION'] ||= '1.8.7:1.9.3:2.0.0:2.1.6:2.2.2:2.3.0'
@@ -188,8 +188,8 @@ if USE_RAKE_COMPILER
     end
   end
 
-  desc "build a windows gem without all the ceremony."
-  task "gem:windows" do
+  desc "build native fat binary gems for windows and linux"
+  task "gem:native" do
     require "rake_compiler_dock"
     RakeCompilerDock.sh "bundle && rake cross native gem MAKE='nice make -j`nproc`'"
   end
