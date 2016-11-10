@@ -191,7 +191,8 @@ if USE_RAKE_COMPILER
   desc "build native fat binary gems for windows and linux"
   task "gem:native" do
     require "rake_compiler_dock"
-    RakeCompilerDock.sh "bundle && rake cross native gem MAKE='nice make -j`nproc`'"
+    sh "bundle package"
+    RakeCompilerDock.sh "bundle --local && rake cross native gem MAKE='nice make -j`nproc`'"
   end
 end
 
