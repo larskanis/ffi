@@ -47,6 +47,8 @@
 #include <fcntl.h>
 #include "Thread.h"
 
+#include <ruby/thread.h>
+
 #ifdef _WIN32
 static volatile DWORD frame_thread_key = TLS_OUT_OF_INDEXES;
 #else
@@ -98,9 +100,20 @@ rbffi_frame_pop(rbffi_frame_t* frame)
 #endif
 }
 
-#if !(defined(HAVE_RB_THREAD_BLOCKING_REGION) || defined(HAVE_RB_THREAD_CALL_WITHOUT_GVL))
 
-#if !defined(_WIN32)
+#if defined(HAVE_RB_THREAD_BLOCKING_REGION) || defined(HAVE_RB_THREAD_CALL_WITHOUT_GVL)
+
+VALUE
+rbffi_thread_blocking_region(VALUE (*func)(void *), void *data1, void (*ubf)(void *), void *data2)
+{
+#if defined(HAVE_RB_THREAD_CALL_WITHOUT_GVL)
+    return (VALUE) rb_thread_call_without_gvl((void *(*)(void *))func, data1, ubf, data2);
+#else
+    return rb_thread_blocking_region(func, data1, ubf, data2);
+#endif
+}
+
+#elif !defined(_WIN32)
 
 struct BlockingThread {
     pthread_t tid;
@@ -313,8 +326,6 @@ rbffi_thread_blocking_region(VALUE (*func)(void *), void *data1, void (*ubf)(voi
 }
 
 #endif /* !_WIN32 */
-
-#endif /* HAVE_RB_THREAD_BLOCKING_REGION */
 
 #ifndef _WIN32
 static struct thread_data* thread_data_init(void);
