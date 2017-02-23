@@ -29,7 +29,10 @@ if !defined?(RUBY_ENGINE) || RUBY_ENGINE == 'ruby' || RUBY_ENGINE == 'rbx'
   have_func('rb_thread_call_with_gvl')
   have_func('rb_thread_call_without_gvl')
   have_func('ruby_native_thread_p')
-  have_func('ruby_thread_has_gvl_p')
+  if RbConfig::CONFIG['host_os'].downcase !~ /darwin/ || RUBY_VERSION >= "2.3.0"
+    # On OSX ruby_thread_has_gvl_p is detected but fails at runtime for ruby < 2.3.0
+    have_func('ruby_thread_has_gvl_p')
+  end
   have_func('ffi_prep_cif_var')
 
   $defs << "-DHAVE_EXTCONF_H" if $defs.empty? # needed so create_header works
