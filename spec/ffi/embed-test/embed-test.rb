@@ -9,7 +9,7 @@
 # that the C extension initializes FFI and then calls a callback
 # which deadlocked in earlier FFI versions, see
 # https://github.com/ffi/ffi/issues/527
- 
+
 EXT = File.expand_path("ext/embed_test.so", File.dirname(__FILE__))
 
 old = Dir.pwd

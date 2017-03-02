@@ -747,16 +747,6 @@ describe "Callback with " do
     }.to raise_error(ArgumentError)
   end
 
-  it "ffi callback from embedded ruby does not deadlock" do
-    pid = spawn(RbConfig.ruby, "/home/kugel/dev/ruby-ffi.git/spec/ffi/embed-test/embed-test.rb")
-    thr = Thread.new do Process.wait(pid) end
-    sleep 0.2
-    frozen = thr.alive?
-    Process.kill("KILL", pid) if (thr.alive?)
-    thr.join
-    expect(frozen).to eq(false)
-  end
-
   #
   # Test stdcall convention with function and callback.
   # This is Windows 32-bit only.
@@ -784,14 +774,14 @@ end
 
 describe "Callback from" do
   # https://github.com/ffi/ffi/issues/527
-  it "from C outside ffi call stack does not deadlock [#527]" do
-    path = File.expand_path(File.join(Fie.dirname(__FILE__), "embed-test/embed-test.rb"))
+  it "C outside ffi call stack does not deadlock [#527]" do
+    path = File.join(File.dirname(__FILE__), "embed-test", "embed-test.rb")
     pid = spawn(RbConfig.ruby, path)
     thr = Thread.new do Process.wait(pid) end
     sleep 0.2
     frozen = thr.alive?
     Process.kill("KILL", pid) if (thr.alive?)
     thr.join
-    expect(frozen).to be true
+    expect(frozen).to be false
   end
 end
