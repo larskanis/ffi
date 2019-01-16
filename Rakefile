@@ -100,7 +100,14 @@ end
 
 task 'gem:java' => 'java:gem'
 
-unless java?
+if java?
+  require "rake/javaextensiontask"
+  Rake::JavaExtensionTask.new("ffi_java", gem_spec) do |ext|
+    ext.ext_dir = 'ext/ffi_java'
+    ext.lib_dir = 'lib'
+    ext.debug = true if ENV['JAVA_DEBUG']
+  end
+else
   require 'rake/extensiontask'
   Rake::ExtensionTask.new('ffi_c', gem_spec) do |ext|
     ext.name = 'ffi_c'                                        # indicate the name of the extension.

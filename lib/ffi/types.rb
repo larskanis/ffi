@@ -115,7 +115,7 @@ module FFI
       :double => Type::DOUBLE,
 
       # C long double
-      :long_double => Type::LONGDOUBLE,
+#       :long_double => Type::LONGDOUBLE,
 
       # Native memory address
       :pointer => Type::POINTER,
