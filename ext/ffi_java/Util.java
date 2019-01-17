@@ -26,7 +26,7 @@
  * the terms of any one of the EPL, the GPL or the LGPL.
  ***** END LICENSE BLOCK *****/
 
-package org.jruby.ext.ffi;
+package ffi;
 
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -60,7 +60,7 @@ public final class Util {
     public static final short int16Value(IRubyObject parameter) {
         return (short) longValue(parameter);
     }
-    
+
     public static final int uint16Value(IRubyObject parameter) {
         return (int) longValue(parameter);
     }
@@ -173,11 +173,11 @@ public final class Util {
     }
 
     public static Type findType(ThreadContext context, IRubyObject name) {
-        return context.runtime.getFFI().getTypeResolver().findType(context.runtime, name);
+        return FFI.get(context.runtime).getTypeResolver().findType(context.runtime, name);
     }
 
     public static Type findType(ThreadContext context, IRubyObject name, IRubyObject typeMap) {
-        return context.runtime.getFFI().getTypeResolver().findType(context.runtime, name, typeMap);
+        return FFI.get(context.runtime).getTypeResolver().findType(context.runtime, name, typeMap);
     }
 
     public static ByteOrder parseByteOrder(Ruby runtime, IRubyObject byte_order) {
@@ -188,7 +188,7 @@ public final class Util {
 
             } else if ("little".equals(orderName)) {
                 return ByteOrder.LITTLE_ENDIAN;
-            
+
             } else {
                 return ByteOrder.nativeOrder();
             }

@@ -1,5 +1,5 @@
 
-package org.jruby.ext.ffi;
+package ffi;
 
 import java.nio.ByteOrder;
 
@@ -32,7 +32,7 @@ public class Pointer extends AbstractMemory {
         pointerClass.kindOf = new RubyModule.KindOf() {
             @Override
             public boolean isKindOf(IRubyObject obj, RubyModule type) {
-                return obj instanceof Pointer && super.isKindOf(obj, type); 
+                return obj instanceof Pointer && super.isKindOf(obj, type);
             }
         };
 
@@ -42,7 +42,7 @@ public class Pointer extends AbstractMemory {
         // Add Pointer::NULL as a constant
         Pointer nullPointer = new Pointer(runtime, pointerClass, new NullMemoryIO(runtime));
         pointerClass.setConstant("NULL", nullPointer);
-        
+
         runtime.getNilClass().addMethod("to_ptr", new NilToPointerMethod(runtime.getNilClass(), nullPointer, "to_ptr"));
 
         return pointerClass;
@@ -57,11 +57,11 @@ public class Pointer extends AbstractMemory {
     }
 
     public static final Pointer getNull(Ruby runtime) {
-        return runtime.getFFI().nullPointer;
+        return FFI.get(runtime).nullPointer;
     }
 
     public Pointer(Ruby runtime, RubyClass klazz) {
-        super(runtime, klazz, runtime.getFFI().getNullMemoryIO(), 0);
+        super(runtime, klazz, FFI.get(runtime).getNullMemoryIO(), 0);
     }
 
     public Pointer(Ruby runtime, MemoryIO io) {
@@ -81,7 +81,7 @@ public class Pointer extends AbstractMemory {
     }
 
     public static final RubyClass getPointerClass(Ruby runtime) {
-        return runtime.getFFI().pointerClass;
+        return FFI.get(runtime).pointerClass;
     }
 
     public final AbstractMemory order(Ruby runtime, ByteOrder order) {
@@ -89,7 +89,7 @@ public class Pointer extends AbstractMemory {
                 order.equals(getMemoryIO().order()) ? getMemoryIO() : new SwappedMemoryIO(runtime, getMemoryIO()),
                 size, typeSize);
     }
-    
+
     @JRubyMethod(name = "size", meta = true, visibility = PUBLIC)
     public static IRubyObject size(ThreadContext context, IRubyObject recv) {
         return RubyFixnum.newFixnum(context.getRuntime(), Factory.getInstance().sizeOf(NativeType.POINTER));
@@ -116,9 +116,9 @@ public class Pointer extends AbstractMemory {
 
         return this;
     }
-    
+
     /**
-     * 
+     *
      */
     @JRubyMethod(required = 1, visibility=PRIVATE)
     public IRubyObject initialize_copy(ThreadContext context, IRubyObject other) {
@@ -176,7 +176,7 @@ public class Pointer extends AbstractMemory {
                 || getAddress() == 0L && obj.isNil()
                 || (obj instanceof Pointer && ((Pointer) obj).getAddress() == getAddress()));
     }
-    
+
     @Override
     protected AbstractMemory slice(Ruby runtime, long offset) {
         return new Pointer(runtime, getPointerClass(runtime),

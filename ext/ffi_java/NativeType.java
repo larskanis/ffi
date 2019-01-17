@@ -12,7 +12,7 @@
  * rights and limitations under the License.
  *
  * Copyright (C) 2008 JRuby project
- * 
+ *
  * Alternatively, the contents of this file may be used under the terms of
  * either of the GNU General Public License Version 2 or later (the "GPL"),
  * or the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
@@ -26,7 +26,7 @@
  * the terms of any one of the EPL, the GPL or the LGPL.
  ***** END LICENSE BLOCK *****/
 
-package org.jruby.ext.ffi;
+package ffi;
 
 import org.jruby.runtime.builtin.IRubyObject;
 
@@ -55,9 +55,9 @@ public enum NativeType {
     BUFFER_OUT,
     BUFFER_INOUT,
     CHAR_ARRAY,
-    
-    /** 
-     * An immutable string.  Nul terminated, but only copies in to the native function 
+
+    /**
+     * An immutable string.  Nul terminated, but only copies in to the native function
      */
     STRING,
 
@@ -71,11 +71,11 @@ public enum NativeType {
 
     /* map from one type to another */
     MAPPED;
-    
+
     public final int intValue() {
         return ordinal();
     }
-    
+
     public static final NativeType valueOf(IRubyObject type) {
         if  (type instanceof Type) {
             return ((Type) type).getNativeType();

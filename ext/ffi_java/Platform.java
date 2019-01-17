@@ -12,7 +12,7 @@
  * rights and limitations under the License.
  *
  * Copyright (C) 2008 JRuby project
- * 
+ *
  * Alternatively, the contents of this file may be used under the terms of
  * either of the GNU General Public License Version 2 or later (the "GPL"),
  * or the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
@@ -26,7 +26,7 @@
  * the terms of any one of the EPL, the GPL or the LGPL.
  ***** END LICENSE BLOCK *****/
 
-package org.jruby.ext.ffi;
+package ffi;
 
 import java.nio.ByteOrder;
 import java.util.regex.Pattern;
@@ -53,7 +53,7 @@ public class Platform {
     public static final String LIBPREFIX = OS == OS.WINDOWS ? "" : "lib";
     public static final String LIBSUFFIX = determineLibExt();
     public static final String LIBC = determineLibC();
-    
+
     public static final int BIG_ENDIAN = 4321;
     public static final int LITTLE_ENDIAN = 1234;
     public static final int BYTE_ORDER = ByteOrder.nativeOrder().equals(ByteOrder.BIG_ENDIAN) ? BIG_ENDIAN : LITTLE_ENDIAN;
@@ -306,7 +306,7 @@ public class Platform {
         return OS != OS.WINDOWS;
     }
     public final boolean isSupported() {
-        return OS != OS.UNKNOWN 
+        return OS != OS.UNKNOWN
                 && CPU != CPU.UNKNOWN
                 && (addressSize == 32 || addressSize == 64);
     }
@@ -391,7 +391,7 @@ public class Platform {
     public final int addressSize() {
         return addressSize;
     }
-    
+
     /**
      * Gets the 32/64bit mask of a C address/pointer on the native platform.
      *
@@ -466,7 +466,7 @@ public class Platform {
             super(OS.LINUX);
         }
 
-        
+
         @Override
         public String mapLibraryName(String libName) {
             // Older JDK on linux map 'c' to 'libc.so' which doesn't work

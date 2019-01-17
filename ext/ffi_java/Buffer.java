@@ -1,5 +1,5 @@
 
-package org.jruby.ext.ffi;
+package ffi;
 
 
 import java.nio.ByteOrder;
@@ -22,7 +22,7 @@ public final class Buffer extends AbstractMemory {
 
     /** Indicates that the Buffer is used for data copied OUT from native memory */
     public static final int OUT = 0x2;
-    
+
     private int inout;
 
     public static RubyClass createBufferClass(Ruby runtime, RubyModule module) {
@@ -44,16 +44,16 @@ public final class Buffer extends AbstractMemory {
     }
 
     public Buffer(Ruby runtime, RubyClass klass) {
-        super(runtime, klass, runtime.getFFI().getNullMemoryIO(), 0, 0);
+        super(runtime, klass, FFI.get(runtime).getNullMemoryIO(), 0, 0);
         this.inout = IN | OUT;
     }
-    
+
     public Buffer(Ruby runtime, int size) {
         this(runtime, size, IN | OUT);
     }
-    
+
     public Buffer(Ruby runtime, int size, int flags) {
-        this(runtime, runtime.getFFI().bufferClass,
+        this(runtime, FFI.get(runtime).bufferClass,
             allocateMemoryIO(runtime, size), size, 1, flags);
     }
 
@@ -61,12 +61,12 @@ public final class Buffer extends AbstractMemory {
         super(runtime, (RubyClass) klass, io, size, typeSize);
         this.inout = inout;
     }
-    
+
     private static final int getCount(IRubyObject countArg) {
         return countArg instanceof RubyFixnum ? RubyFixnum.fix2int(countArg) : 1;
     }
-    
-    private static Buffer allocate(ThreadContext context, IRubyObject recv, 
+
+    private static Buffer allocate(ThreadContext context, IRubyObject recv,
             IRubyObject sizeArg, int count, int flags) {
         final int typeSize = calculateTypeSize(context, sizeArg);
         final int total = typeSize * count;
@@ -105,9 +105,9 @@ public final class Buffer extends AbstractMemory {
             IRubyObject countArg, IRubyObject clearArg, Block block) {
         return init(context, sizeArg, RubyFixnum.fix2int(countArg), (IN | OUT), block);
     }
-    
+
     /**
-     * 
+     *
      */
     @JRubyMethod(required = 1, visibility=PRIVATE)
     public IRubyObject initialize_copy(ThreadContext context, IRubyObject other) {
@@ -118,7 +118,7 @@ public final class Buffer extends AbstractMemory {
         this.typeSize = orig.typeSize;
         this.size = orig.size;
         this.inout = orig.inout;
-        
+
         setMemoryIO(orig.getMemoryIO().dup());
         return this;
     }
@@ -135,13 +135,13 @@ public final class Buffer extends AbstractMemory {
     }
 
     @JRubyMethod(name = { "alloc_inout", "__alloc_inout" }, meta = true)
-    public static Buffer allocateInOut(ThreadContext context, IRubyObject recv, 
+    public static Buffer allocateInOut(ThreadContext context, IRubyObject recv,
             IRubyObject sizeArg, IRubyObject countArg, IRubyObject clearArg) {
         return allocate(context, recv, sizeArg, RubyFixnum.fix2int(countArg), IN | OUT);
     }
 
     @JRubyMethod(name = { "new_in", "alloc_in", "__alloc_in" }, meta = true)
-    public static Buffer allocateInput(ThreadContext context, IRubyObject recv, IRubyObject arg) {       
+    public static Buffer allocateInput(ThreadContext context, IRubyObject recv, IRubyObject arg) {
         return allocate(context, recv, arg, 1, IN);
     }
 
@@ -178,7 +178,7 @@ public final class Buffer extends AbstractMemory {
                 String.format("#<Buffer size=%d>", size));
     }
 
-    
+
     public final AbstractMemory order(Ruby runtime, ByteOrder order) {
         return new Buffer(runtime, getMetaClass(),
                 order.equals(getMemoryIO().order()) ? getMemoryIO() : new SwappedMemoryIO(runtime, getMemoryIO()),
@@ -199,7 +199,7 @@ public final class Buffer extends AbstractMemory {
     public int getInOutFlags() {
         return inout;
     }
-    
+
     private static MemoryIO allocateMemoryIO(Ruby runtime, int size) {
         return Factory.getInstance().allocateTransientDirectMemory(runtime, size, 8, true);
     }

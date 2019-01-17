@@ -1,5 +1,5 @@
 
-package org.jruby.ext.ffi;
+package ffi;
 
 abstract public interface AllocatedDirectMemoryIO {
     public void free();

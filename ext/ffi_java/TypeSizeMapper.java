@@ -1,4 +1,4 @@
-package org.jruby.ext.ffi;
+package ffi;
 
 import org.jruby.RubySymbol;
 import org.jruby.runtime.ThreadContext;
@@ -10,6 +10,6 @@ import java.util.Map;
 
 final class TypeSizeMapper {
     public static int getTypeSize(ThreadContext context, RubySymbol sizeArg) {
-        return context.runtime.getFFI().getTypeResolver().findType(context.runtime, sizeArg).size;
+        return FFI.get(context.runtime).getTypeResolver().findType(context.runtime, sizeArg).size;
     }
 }

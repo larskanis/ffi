@@ -1,5 +1,5 @@
 
-package org.jruby.ext.ffi;
+package ffi;
 
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -22,11 +22,11 @@ public final class ArrayMemoryIO extends MemoryIO {
         this.offset = offset;
         this.length = length;
     }
-    
+
     public ArrayMemoryIO(Ruby runtime, int size) {
         this(runtime, new byte[size], 0, size);
     }
-    
+
     private final void checkBounds(long off, long len) {
         Util.checkBounds(runtime, arrayLength(), off, len);
     }
@@ -89,12 +89,12 @@ public final class ArrayMemoryIO extends MemoryIO {
     public ArrayMemoryIO dup() {
         ArrayMemoryIO tmp = new ArrayMemoryIO(runtime, length);
         System.arraycopy(array(), arrayOffset(), tmp.array(), tmp.arrayOffset(), length);
-        
+
         return tmp;
     }
-    
-    
-    
+
+
+
     public java.nio.ByteBuffer asByteBuffer() {
         return java.nio.ByteBuffer.wrap(buffer, offset, length).duplicate();
     }
@@ -332,12 +332,12 @@ public final class ArrayMemoryIO extends MemoryIO {
         Arrays.fill(buffer, offset, length, (byte) 0);
     }
     protected static abstract class ArrayIO {
-        
+
         public abstract short getInt16(byte[] buffer, int offset);
         public abstract int getInt32(byte[] buffer, int offset);
         public abstract long getInt64(byte[] buffer, int offset);
         public abstract long getAddress(byte[] buffer, int offset);
-        
+
         public abstract void putInt16(byte[] buffer, int offset, int value);
         public abstract void putInt32(byte[] buffer, int offset, int value);
         public abstract void putInt64(byte[] buffer, int offset, long value);

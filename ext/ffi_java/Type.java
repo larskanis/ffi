@@ -1,5 +1,5 @@
 
-package org.jruby.ext.ffi;
+package ffi;
 
 import java.util.Map;
 import org.jruby.Ruby;
@@ -38,10 +38,10 @@ public abstract class Type extends RubyObject {
         RubyClass builtinClass = typeClass.defineClassUnder("Builtin", typeClass,
                 ObjectAllocator.NOT_ALLOCATABLE_ALLOCATOR);
         builtinClass.defineAnnotatedMethods(Builtin.class);
-        
+
         RubyModule nativeType = ffiModule.defineModuleUnder("NativeType");
 
-        
+
         defineBuiltinType(runtime, builtinClass, NativeType.CHAR, "char", "schar", "int8", "sint8");
         defineBuiltinType(runtime, builtinClass, NativeType.UCHAR, "uchar", "uint8");
         defineBuiltinType(runtime, builtinClass, NativeType.SHORT, "short", "sshort", "int16", "sint16");
@@ -54,7 +54,7 @@ public abstract class Type extends RubyObject {
         defineBuiltinType(runtime, builtinClass, NativeType.ULONG, "ulong");
         defineBuiltinType(runtime, builtinClass, NativeType.FLOAT, "float", "float32");
         defineBuiltinType(runtime, builtinClass, NativeType.DOUBLE, "double", "float64");
-        
+
         for (NativeType t : NativeType.values()) {
             if (!builtinClass.hasConstant(t.name())) {
                 try {
@@ -190,7 +190,7 @@ public abstract class Type extends RubyObject {
                     String.format("#<FFI::Type::Builtin:%s size=%d alignment=%d>",
                     nativeType.name(), size, alignment));
         }
-        
+
         @Override
         public final String toString() {
             return nativeType.name();
@@ -224,7 +224,7 @@ public abstract class Type extends RubyObject {
         public IRubyObject equal_p(ThreadContext context, IRubyObject obj) {
             return context.runtime.newBoolean(this.equals(obj));
         }
-        
+
         @JRubyMethod(name = "eql?", required = 1)
         public IRubyObject eql_p(ThreadContext context, IRubyObject obj) {
             return context.runtime.newBoolean(this.equals(obj));

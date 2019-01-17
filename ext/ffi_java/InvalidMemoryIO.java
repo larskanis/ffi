@@ -1,6 +1,6 @@
 
 
-package org.jruby.ext.ffi;
+package ffi;
 
 import java.nio.ByteOrder;
 import org.jruby.Ruby;
@@ -13,7 +13,7 @@ import org.jruby.exceptions.RaiseException;
 public abstract class InvalidMemoryIO extends MemoryIO {
     protected final Ruby runtime;
     private final String message;
-    
+
     public InvalidMemoryIO(Ruby runtime, boolean isDirect, long address, String message) {
         super(isDirect, address);
         this.runtime = runtime;
@@ -31,7 +31,7 @@ public abstract class InvalidMemoryIO extends MemoryIO {
     public ByteOrder order() {
         return ByteOrder.nativeOrder();
     }
-    
+
     public MemoryIO slice(long offset) {
         return this;
     }
@@ -39,7 +39,7 @@ public abstract class InvalidMemoryIO extends MemoryIO {
     public MemoryIO slice(long offset, long size) {
         return this;
     }
-    
+
     public MemoryIO dup() {
         return this;
     }

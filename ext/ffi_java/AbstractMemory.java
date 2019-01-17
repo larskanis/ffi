@@ -12,7 +12,7 @@
  * rights and limitations under the License.
  *
  * Copyright (C) 2008 JRuby project
- * 
+ *
  * Alternatively, the contents of this file may be used under the terms of
  * either of the GNU General Public License Version 2 or later (the "GPL"),
  * or the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
@@ -26,7 +26,7 @@
  * the terms of any one of the EPL, the GPL or the LGPL.
  ***** END LICENSE BLOCK *****/
 
-package org.jruby.ext.ffi;
+package ffi;
 
 import java.nio.ByteOrder;
 import org.jruby.Ruby;
@@ -65,13 +65,13 @@ abstract public class AbstractMemory extends MemoryObject {
         RubyClass result = module.defineClassUnder(ABSTRACT_MEMORY_RUBY_CLASS,
                 runtime.getObject(),
                 ObjectAllocator.NOT_ALLOCATABLE_ALLOCATOR);
-        
+
         result.defineAnnotatedMethods(AbstractMemory.class);
         result.defineAnnotatedConstants(AbstractMemory.class);
 
         return result;
     }
-    
+
     protected static final int calculateTypeSize(ThreadContext context, IRubyObject sizeArg) {
         if (sizeArg instanceof RubyFixnum) {
             return (int) ((RubyFixnum) sizeArg).getLongValue();
@@ -138,7 +138,7 @@ abstract public class AbstractMemory extends MemoryObject {
     protected final long getOffset(IRubyObject offset) {
         return Util.longValue(offset);
     }
-    
+
     /**
      * Gets the size of the memory area.
      *
@@ -188,13 +188,13 @@ abstract public class AbstractMemory extends MemoryObject {
         final AbstractMemory other = (AbstractMemory) obj;
         return other.getMemoryIO().equals(getMemoryIO());
     }
-    
+
     @JRubyMethod(name = "==", required = 1)
     @Override
     public IRubyObject op_equal(ThreadContext context, IRubyObject obj) {
         return context.runtime.newBoolean(this.equals(obj));
     }
-    
+
     /**
      * Calculates the hash code for this <tt>MemoryPointer</tt>
      *
@@ -223,7 +223,7 @@ abstract public class AbstractMemory extends MemoryObject {
     public IRubyObject total(ThreadContext context) {
         return RubyFixnum.newFixnum(context.runtime, size);
     }
-    
+
     /**
      * Indicates how many bytes the intrinsic type of the memory uses.
      *
@@ -274,7 +274,7 @@ abstract public class AbstractMemory extends MemoryObject {
 
         return this;
     }
-    
+
     /**
      * Reads an 8 bit signed integer value from the memory address.
      *
@@ -342,7 +342,7 @@ abstract public class AbstractMemory extends MemoryObject {
         getMemoryIO().putByte(getOffset(offset), (byte) Util.uint8Value(value));
         return this;
     }
-    
+
     /**
      * Reads an 8 bit unsigned integer value from the memory address.
      *
@@ -444,7 +444,7 @@ abstract public class AbstractMemory extends MemoryObject {
     public IRubyObject get_int16(ThreadContext context, IRubyObject offset) {
         return Util.newSigned16(context.runtime, getMemoryIO().getShort(getOffset(offset)));
     }
-    
+
     /**
      * Writes a 16 bit unsigned integer value to the memory address.
      *
@@ -657,7 +657,7 @@ abstract public class AbstractMemory extends MemoryObject {
     public IRubyObject get_uint32(ThreadContext context, IRubyObject offset) {
         return Util.newUnsigned32(context.runtime, getMemoryIO().getInt(getOffset(offset)));
     }
-    
+
     /**
      * Writes a 64 bit integer value to the memory area.
      *
@@ -697,7 +697,7 @@ abstract public class AbstractMemory extends MemoryObject {
 
         return this;
     }
-    
+
     /**
      * Reads a 64 bit integer value from the memory address.
      *
@@ -872,7 +872,7 @@ abstract public class AbstractMemory extends MemoryObject {
                 ? get_int32(context, offset)
                 : get_int64(context, offset);
     }
-    
+
     /**
      * Writes a C long integer value to the memory area.
      *
@@ -900,7 +900,7 @@ abstract public class AbstractMemory extends MemoryObject {
                 : put_uint64(context, offset, value);
     }
 
-    
+
     /**
      * Reads a C unsigned long integer value from the memory area.
      *
@@ -1005,7 +1005,7 @@ abstract public class AbstractMemory extends MemoryObject {
     public IRubyObject get_float32(ThreadContext context, IRubyObject offset) {
         return RubyFloat.newFloat(context.runtime, getMemoryIO().getFloat(getOffset(offset)));
     }
-    
+
     /**
      * Writes an 64 bit floating point value to the memory area.
      *
@@ -1154,7 +1154,7 @@ abstract public class AbstractMemory extends MemoryObject {
     public IRubyObject put_array_of_int16(ThreadContext context, IRubyObject offset, IRubyObject arrParam) {
 
         MemoryUtil.putArrayOfSigned16(context.runtime, getMemoryIO(), getOffset(offset), checkArray(arrParam));
-        
+
         return this;
     }
 
@@ -1399,7 +1399,7 @@ abstract public class AbstractMemory extends MemoryObject {
 
         return this;
     }
-    
+
     /**
      * Reads an array of signed 8 bit integer values from the memory address.
      *
@@ -1424,7 +1424,7 @@ abstract public class AbstractMemory extends MemoryObject {
 
         return this;
     }
-    
+
     /**
      * Reads an array of unsigned 8 bit integer values from the memory address.
      *
@@ -1450,7 +1450,7 @@ abstract public class AbstractMemory extends MemoryObject {
 
         return this;
     }
-    
+
     /**
      * Reads an array of signed 16 bit integer values from the memory address.
      *
@@ -1475,7 +1475,7 @@ abstract public class AbstractMemory extends MemoryObject {
 
         return this;
     }
-    
+
     /**
      * Reads an array of unsigned 16 bit integer values from the memory address.
      *
@@ -1500,8 +1500,8 @@ abstract public class AbstractMemory extends MemoryObject {
 
         return this;
     }
-    
-    
+
+
     /**
      * Reads an array of signed 32 bit integer values from the memory address.
      *
@@ -1526,7 +1526,7 @@ abstract public class AbstractMemory extends MemoryObject {
 
         return this;
     }
-    
+
     /**
      * Reads an array of unsigned 32 bit integer values from the memory address.
      *
@@ -1576,7 +1576,7 @@ abstract public class AbstractMemory extends MemoryObject {
 
         return this;
     }
-    
+
     /**
      * Reads an array of unsigned 64 bit integer values from the memory address.
      *
@@ -1601,7 +1601,7 @@ abstract public class AbstractMemory extends MemoryObject {
 
         return this;
     }
-    
+
     /**
      * Reads an array of signed long integer values from the memory address.
      *
@@ -1627,7 +1627,7 @@ abstract public class AbstractMemory extends MemoryObject {
                 ? write_array_of_int32(context, ary)
                 : write_array_of_int64(context, ary);
     }
-    
+
     /**
      * Reads an array of unsigned long integer values from the memory address.
      *
@@ -1653,7 +1653,7 @@ abstract public class AbstractMemory extends MemoryObject {
                 ? write_array_of_uint32(context, ary)
                 : write_array_of_uint64(context, ary);
     }
-    
+
     /**
      * Reads an array of signed 32 bit floating point values from the memory address.
      *
@@ -1705,7 +1705,7 @@ abstract public class AbstractMemory extends MemoryObject {
 
     @JRubyMethod(name = { "read_array_of_type" }, required = 2)
     public IRubyObject read_array_of_type(ThreadContext context, IRubyObject typeArg, IRubyObject lenArg) {
-        Type type = context.runtime.getFFI().getTypeResolver().findType(context.runtime, typeArg);
+        Type type = FFI.get(context.runtime).getTypeResolver().findType(context.runtime, typeArg);
         MemoryOp op = MemoryOp.getMemoryOp(type);
         if (op == null) {
             throw context.runtime.newTypeError("cannot get memory reader for type " + type);
@@ -1723,9 +1723,9 @@ abstract public class AbstractMemory extends MemoryObject {
 
     @JRubyMethod(name = { "read_array_of_type" }, required = 3)
     public IRubyObject read_array_of_type(ThreadContext context, IRubyObject typeArg, IRubyObject reader, IRubyObject lenArg) {
-        Type type = context.runtime.getFFI().getTypeResolver().findType(context.runtime, typeArg);
+        Type type = FFI.get(context.runtime).getTypeResolver().findType(context.runtime, typeArg);
         DynamicMethod method = getMetaClass().searchMethod(reader.asJavaString());
-        
+
         int len = checkArrayLength(lenArg);
         RubyArray arr = RubyArray.newArray(context.runtime, len);
 
@@ -1738,7 +1738,7 @@ abstract public class AbstractMemory extends MemoryObject {
 
     @JRubyMethod(name = { "write_array_of_type" }, required = 2)
     public IRubyObject write_array_of_type(ThreadContext context, IRubyObject typeArg, IRubyObject aryArg) {
-        Type type = context.runtime.getFFI().getTypeResolver().findType(context.runtime, typeArg);
+        Type type = FFI.get(context.runtime).getTypeResolver().findType(context.runtime, typeArg);
         MemoryOp op = MemoryOp.getMemoryOp(type);
         if (op == null) {
             throw context.runtime.newTypeError("cannot get memory writer for type " + type);
@@ -1756,7 +1756,7 @@ abstract public class AbstractMemory extends MemoryObject {
 
     @JRubyMethod(name = { "write_array_of_type" }, required = 3)
     public IRubyObject write_array_of_type(ThreadContext context, IRubyObject typeArg, IRubyObject writer, IRubyObject aryArg) {
-        Type type = context.runtime.getFFI().getTypeResolver().findType(context.runtime, typeArg);
+        Type type = FFI.get(context.runtime).getTypeResolver().findType(context.runtime, typeArg);
         DynamicMethod method = getMetaClass().searchMethod(writer.asJavaString());
 
         RubyArray arr = aryArg.convertToArray();
@@ -1769,7 +1769,7 @@ abstract public class AbstractMemory extends MemoryObject {
         return this;
     }
 
-    
+
 
     @JRubyMethod(name = "read_string")
     public IRubyObject read_string(ThreadContext context) {
@@ -1836,17 +1836,17 @@ abstract public class AbstractMemory extends MemoryObject {
 
         return arr;
     }
-    
+
     @JRubyMethod(name = { "read_array_of_string" })
     public IRubyObject read_array_of_string(ThreadContext context) {
         return get_array_of_string(context, RubyFixnum.zero(context.runtime));
     }
-    
+
     @JRubyMethod(name = { "read_array_of_string" }, required = 1)
     public IRubyObject read_array_of_string(ThreadContext context, IRubyObject rbLength) {
         return get_array_of_string(context, RubyFixnum.zero(context.runtime), rbLength);
     }
-    
+
 
 
     @JRubyMethod(name = "put_string")
@@ -1931,18 +1931,18 @@ abstract public class AbstractMemory extends MemoryObject {
 
     private void putPointer(ThreadContext context, long offset, IRubyObject value) {
         DynamicMethod conversionMethod;
-        
+
         if (value instanceof Pointer) {
             putPointer(context, offset, (Pointer) value);
-        
+
         } else if (value.isNil()) {
             getMemoryIO().putAddress(offset, 0L);
-        
+
         } else if (!(conversionMethod = value.getMetaClass().searchMethod("to_ptr")).isUndefined()) {
             putPointer(context, offset, conversionMethod.call(context, value, value.getMetaClass(), "to_ptr"));
-        
+
         } else {
-            throw context.runtime.newTypeError(value, context.runtime.getFFI().pointerClass);
+            throw context.runtime.newTypeError(value, FFI.get(context.runtime).pointerClass);
         }
     }
 
@@ -2002,18 +2002,18 @@ abstract public class AbstractMemory extends MemoryObject {
         }
         return this;
     }
-    
+
     @JRubyMethod(name = { "read_array_of_pointer" }, required = 1)
     public IRubyObject read_array_of_pointer(ThreadContext context, IRubyObject length) {
         return get_array_of_pointer(context, RubyFixnum.zero(context.runtime), length);
     }
-    
+
     @JRubyMethod(name = { "write_array_of_pointer" }, required = 1)
     public IRubyObject write_array_of_pointer(ThreadContext context, IRubyObject arrParam) {
         return put_array_of_pointer(context, RubyFixnum.zero(context.runtime), arrParam);
     }
-    
-    
+
+
 
     @JRubyMethod(name = "put_callback", required = 3)
     public IRubyObject put_callback(ThreadContext context, IRubyObject offset, IRubyObject proc, IRubyObject cbInfo) {
@@ -2024,7 +2024,7 @@ abstract public class AbstractMemory extends MemoryObject {
         getMemoryIO().putMemoryIO(getOffset(offset), ((AbstractMemory) ptr).getMemoryIO());
         return this;
     }
-    
+
     @JRubyMethod(name = "+", required = 1)
     public IRubyObject op_plus(ThreadContext context, IRubyObject value) {
         return slice(context.runtime, RubyNumeric.fix2long(value));
@@ -2044,7 +2044,7 @@ abstract public class AbstractMemory extends MemoryObject {
     public final IRubyObject to_ptr(ThreadContext context) {
         return this;
     }
-    
+
     @JRubyMethod(name = "slice")
     public final IRubyObject slice(ThreadContext context, IRubyObject offset, IRubyObject size) {
         return slice(context.getRuntime(), RubyNumeric.num2int(offset), RubyNumeric.num2int(size));

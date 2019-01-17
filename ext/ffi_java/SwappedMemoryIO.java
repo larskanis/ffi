@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.jruby.ext.ffi;
+package ffi;
 
 import java.nio.ByteOrder;
 import org.jruby.Ruby;
@@ -48,7 +48,7 @@ public final class SwappedMemoryIO extends MemoryIO {
     public SwappedMemoryIO slice(long offset, long size) {
         return new SwappedMemoryIO(runtime, io.slice(offset, size));
     }
-    
+
     public SwappedMemoryIO dup() {
         return new SwappedMemoryIO(runtime, io.dup());
     }
@@ -133,7 +133,7 @@ public final class SwappedMemoryIO extends MemoryIO {
     public final void putAddress(long offset, long value) {
         throw runtime.newRuntimeError("cannot write native address values to non-native byte order memory");
     }
-    
+
     public final void putFloat(long offset, float value) {
         io.putFloat(offset, Float.intBitsToFloat(Integer.reverseBytes(Float.floatToRawIntBits(value))));
     }

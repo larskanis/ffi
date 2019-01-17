@@ -26,7 +26,7 @@
  * the terms of any one of the EPL, the GPL or the LGPL.
  ***** END LICENSE BLOCK *****/
 
-package org.jruby.ext.ffi;
+package ffi;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -65,7 +65,7 @@ public final class Enum extends RubyObject {
         enumClass.defineAnnotatedMethods(Enum.class);
         enumClass.defineAnnotatedConstants(Enum.class);
         enumClass.includeModule(ffiModule.getConstant("DataConverter"));
-        
+
         return enumClass;
     }
 
@@ -90,7 +90,7 @@ public final class Enum extends RubyObject {
 
     @JRubyMethod(name = "initialize", visibility = Visibility.PRIVATE)
     public final IRubyObject initialize(ThreadContext context, IRubyObject arg0, IRubyObject arg1) {
-        if (arg0 instanceof org.jruby.ext.ffi.Type)
+        if (arg0 instanceof ffi.Type)
             return initialize(context, arg0, arg1, null);
 
         if (arg1.isNil())
@@ -103,7 +103,7 @@ public final class Enum extends RubyObject {
     @JRubyMethod(name = "initialize", visibility = Visibility.PRIVATE)
     public final IRubyObject initialize(ThreadContext context, IRubyObject type, IRubyObject values, IRubyObject tag) {
         int offset = 0;
-        if (type instanceof org.jruby.ext.ffi.Type) {
+        if (type instanceof ffi.Type) {
             nativeType = type;
         } else {
             if (!(type == null || type.isNil()))

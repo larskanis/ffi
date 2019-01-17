@@ -1,4 +1,4 @@
-package org.jruby.ext.ffi;
+package ffi;
 
 import org.jruby.Ruby;
 import org.jruby.RubyClass;
@@ -39,9 +39,9 @@ class ReifyingAllocator implements ObjectAllocator {
             throw runtime.newSecurityError("could not allocate " + this.klass + " due to inaccessible default constructor:\n" + ite);
         }
     }
-    
+
     private static void reifyWithAncestors(RubyClass klazz) {
-        
+
         RubyClass realSuper = klazz.getSuperClass().getRealClass();
 
         if (realSuper.getReifiedClass() == null) reifyWithAncestors(realSuper);

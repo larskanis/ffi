@@ -26,11 +26,11 @@
  * the terms of any one of the EPL, the GPL or the LGPL.
  ***** END LICENSE BLOCK *****/
 
-package org.jruby.ext.ffi;
+package ffi;
 
 import org.jruby.anno.JRubyClass;
 import org.jruby.anno.JRubyMethod;
-import org.jruby.ext.ffi.Enum;
+import ffi.Enum;
 import org.jruby.Ruby;
 import org.jruby.RubyArray;
 import org.jruby.RubyBoolean;
@@ -55,7 +55,7 @@ public final class Enums extends RubyObject {
     private final RubyArray allEnums;
     private final RubyHash symbolMap;
     private final RubyHash taggedEnums;
-        
+
     public static RubyClass createEnumsClass(Ruby runtime, RubyModule ffiModule) {
         RubyClass enumsClass = ffiModule.defineClassUnder("Enums", runtime.getObject(),
                 Allocator.INSTANCE);

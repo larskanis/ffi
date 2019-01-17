@@ -104,7 +104,9 @@ if java?
   require "rake/javaextensiontask"
   Rake::JavaExtensionTask.new("ffi_java", gem_spec) do |ext|
     ext.ext_dir = 'ext/ffi_java'
-    ext.lib_dir = 'lib'
+    ext.lib_dir = 'lib/ffi'
+    jars = FileList['lib/*.jar']
+    ext.classpath = jars.map { |x| File.expand_path x }.join ':'
     ext.debug = true if ENV['JAVA_DEBUG']
   end
 else

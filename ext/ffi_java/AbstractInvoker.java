@@ -12,7 +12,7 @@
  * rights and limitations under the License.
  *
  * Copyright (C) 2008 JRuby project
- * 
+ *
  * Alternatively, the contents of this file may be used under the terms of
  * either of the GNU General Public License Version 2 or later (the "GPL"),
  * or the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
@@ -26,7 +26,7 @@
  * the terms of any one of the EPL, the GPL or the LGPL.
  ***** END LICENSE BLOCK *****/
 
-package org.jruby.ext.ffi;
+package ffi;
 
 import org.jruby.Ruby;
 import org.jruby.RubyClass;
@@ -45,12 +45,12 @@ import org.jruby.runtime.builtin.IRubyObject;
 @JRubyClass(name = "FFI::" + AbstractInvoker.CLASS_NAME, parent = "Object")
 public abstract class AbstractInvoker extends Pointer {
     static final String CLASS_NAME = "AbstractInvoker";
-    
+
     /**
      * The arity of this function.
      */
     protected final Arity arity;
-    
+
     public static RubyClass createAbstractInvokerClass(Ruby runtime, RubyModule module) {
         RubyClass result = module.defineClassUnder(CLASS_NAME,
                 module.getClass("Pointer"),
@@ -60,7 +60,7 @@ public abstract class AbstractInvoker extends Pointer {
 
         return result;
     }
-    
+
     /**
      * Creates a new <tt>AbstractInvoker</tt> instance.
      * @param arity
@@ -72,27 +72,27 @@ public abstract class AbstractInvoker extends Pointer {
 
     /**
      * Attaches this function to a ruby module or class.
-     * 
+     *
      * @param module The module or class to attach the function to.
      * @param methodName The ruby name to attach the function as.
      */
     @JRubyMethod(name="attach")
     public IRubyObject attach(ThreadContext context, IRubyObject obj, IRubyObject methodName) {
-        
+
         DynamicMethod m = createDynamicMethod(obj.getSingletonClass());
         obj.getSingletonClass().addMethod(methodName.asJavaString(), m);
         if (obj instanceof RubyModule) {
             ((RubyModule) obj).addMethod(methodName.asJavaString(), m);
         }
-        getRuntime().getFFI().registerAttachedMethod(m, this);
-        
+        FFI.get(getRuntime()).registerAttachedMethod(m, this);
+
         return this;
     }
     protected abstract DynamicMethod createDynamicMethod(RubyModule module);
 
     /**
      * Returns the {@link org.jruby.runtime.Arity} of this function.
-     * 
+     *
      * @return The <tt>Arity</tt> of the native function.
      */
     public final Arity getArity() {

@@ -1,8 +1,8 @@
 /*
- * 
+ *
  */
 
-package org.jruby.ext.ffi;
+package ffi;
 
 
 import org.jruby.Ruby;
@@ -88,7 +88,7 @@ public final class MappedType extends Type {
 
         return new MappedType(context.runtime, (RubyClass) klass, nativeType, converter, isReferenceRequired);
     }
-    
+
     public final Type getRealType() {
         return realType;
     }

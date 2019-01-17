@@ -26,7 +26,7 @@
  * the terms of any one of the EPL, the GPL or the LGPL.
  ***** END LICENSE BLOCK *****/
 
-package org.jruby.ext.ffi.io;
+package ffi.io;
 
 import jnr.posix.FileStat;
 import org.jruby.Ruby;

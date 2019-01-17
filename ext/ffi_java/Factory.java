@@ -12,7 +12,7 @@
  * rights and limitations under the License.
  *
  * Copyright (C) 2008 JRuby project
- * 
+ *
  * Alternatively, the contents of this file may be used under the terms of
  * either of the GNU General Public License Version 2 or later (the "GPL"),
  * or the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
@@ -26,14 +26,14 @@
  * the terms of any one of the EPL, the GPL or the LGPL.
  ***** END LICENSE BLOCK *****/
 
-package org.jruby.ext.ffi;
+package ffi;
 
 import java.util.ArrayList;
 import java.util.List;
 import org.jruby.Ruby;
 import org.jruby.RubyHash;
 import org.jruby.RubyModule;
-import org.jruby.ext.ffi.io.FileDescriptorIO;
+import ffi.io.FileDescriptorIO;
 
 /**
  * A factory that can create a FFI Provider
@@ -57,7 +57,7 @@ public abstract class Factory {
             providerNames.add(prefix + ".jffi.Factory");
             for (String className : providerNames) {
                 try {
-                    factory = (Factory) Class.forName(className, true, Ruby.getClassLoader()).newInstance();
+                    factory = (Factory) Class.forName(className).newInstance();
                     break;
                 } catch (Throwable ex) {
                     errors.add(ex);
@@ -81,16 +81,16 @@ public abstract class Factory {
 
     /**
      * Gets an instance of <tt>FFIProvider</tt>
-     * 
+     *
      * @return an instance of <tt>FFIProvider</tt>
      */
     public static final Factory getInstance() {
         return SingletonHolder.INSTANCE;
     }
-    
+
     /**
      * Registers FFI ruby classes/modules
-     * 
+     *
      * @param module the module to register the classes under
      */
     public void init(Ruby runtime, RubyModule ffi) {
@@ -147,11 +147,11 @@ public abstract class Factory {
 
             Platform.createPlatformModule(runtime, ffi);
             IOModule.createIOModule(runtime, ffi);
-            
+
             StructByReference.createStructByReferenceClass(runtime, ffi);
         }
     }
-    
+
     /**
      * Allocates memory on the native C heap and wraps it in a <tt>MemoryIO</tt> accessor.
      *
@@ -185,7 +185,7 @@ public abstract class Factory {
      * Wraps a  native C memory address in a <tt>MemoryIO</tt> accessor.
      *
      * @param address The native address to wrap.
-     * 
+     *
      * @return A new <tt>MemoryIO</tt>.
      */
     public abstract MemoryIO wrapDirectMemory(Ruby runtime, long address);

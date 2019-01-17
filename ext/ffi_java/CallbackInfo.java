@@ -12,7 +12,7 @@
  * rights and limitations under the License.
  *
  * Copyright (C) 2008, 2009 JRuby project
- * 
+ *
  * Alternatively, the contents of this file may be used under the terms of
  * either of the GNU General Public License Version 2 or later (the "GPL"),
  * or the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
@@ -26,7 +26,7 @@
  * the terms of any one of the EPL, the GPL or the LGPL.
  ***** END LICENSE BLOCK *****/
 
-package org.jruby.ext.ffi;
+package ffi;
 
 import org.jruby.Ruby;
 import org.jruby.RubyArray;
@@ -46,7 +46,7 @@ import org.jruby.runtime.builtin.IRubyObject;
 @JRubyClass(name = "FFI::CallbackInfo", parent = "FFI::Type")
 public class CallbackInfo extends Type {
     public static final String CLASS_NAME = "CallbackInfo";
-    
+
     /** The arity of this function. */
     protected final Arity arity;
 
@@ -72,7 +72,7 @@ public class CallbackInfo extends Type {
         Type.setConstant("Function", result);
         return result;
     }
-    
+
     /**
      * Creates a new <tt>CallbackInfo</tt> instance.
      *
@@ -138,7 +138,7 @@ public class CallbackInfo extends Type {
             RubyHash hash = (RubyHash) args[2];
             stdcall = "stdcall".equals(hash.get(context.runtime.newSymbol("convention")));
         }
-        
+
         try {
             return new CallbackInfo(context.runtime, (RubyClass) klass,
                     (Type) returnType, nativeParamTypes, stdcall);
@@ -146,10 +146,10 @@ public class CallbackInfo extends Type {
             return context.nil;
         }
     }
-    
+
     /**
      * Returns the {@link org.jruby.runtime.Arity} of this function.
-     * 
+     *
      * @return The <tt>Arity</tt> of the native function.
      */
     public final Arity getArity() {

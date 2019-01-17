@@ -1,5 +1,5 @@
 
-package org.jruby.ext.ffi;
+package ffi;
 
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
@@ -26,15 +26,15 @@ import static org.jruby.runtime.Visibility.*;
 @JRubyClass(name = "FFI::" + AutoPointer.AUTOPTR_CLASS_NAME, parent = "FFI::Pointer")
 public class AutoPointer extends Pointer {
     static final String AUTOPTR_CLASS_NAME = "AutoPointer";
-    
+
     /** Keep strong references to the Reaper until cleanup */
     private static final ConcurrentMap<ReaperGroup, Boolean> referenceSet = new ConcurrentHashMap<ReaperGroup, Boolean>();
     private static final ThreadLocal<Reference<ReaperGroup>> currentReaper = new ThreadLocal<Reference<ReaperGroup>>();
-    
+
     private Pointer pointer;
     private Object referent;
     private transient volatile Reaper reaper;
-    
+
     public static RubyClass createAutoPointerClass(Ruby runtime, RubyModule module) {
         RubyClass autoptrClass = module.defineClassUnder(AUTOPTR_CLASS_NAME,
                 module.getClass("Pointer"),
@@ -62,12 +62,12 @@ public class AutoPointer extends Pointer {
     }
 
     public AutoPointer(Ruby runtime, RubyClass klazz) {
-        super(runtime, klazz, runtime.getFFI().getNullMemoryIO());
+        super(runtime, klazz, FFI.get(runtime).getNullMemoryIO());
     }
-    
+
     private static final void checkPointer(Ruby runtime, IRubyObject ptr) {
         if (!(ptr instanceof Pointer)) {
-            throw runtime.newTypeError(ptr, runtime.getFFI().pointerClass);
+            throw runtime.newTypeError(ptr, FFI.get(runtime).pointerClass);
         }
         if (ptr instanceof MemoryPointer || ptr instanceof AutoPointer) {
             throw runtime.newTypeError("Cannot use AutoPointer with MemoryPointer or AutoPointer instances");
@@ -197,32 +197,32 @@ public class AutoPointer extends Pointer {
         private final WeakReference<Object> weakref;
         private int reaperCount;
         private volatile Reaper head;
-        
+
         ReaperGroup(Object referent) {
             super(referent);
             this.weakref = new WeakReference<Object>(referent);
         }
-        
+
         Object referent() {
             return weakref.get();
         }
-        
+
         boolean canAccept() {
             return reaperCount < MAX_REAPERS_PER_GROUP;
         }
-        
+
         void add(Reaper r) {
             ++reaperCount;
             r.next = head;
             head = r;
         }
-        
+
         public void run() {
             referenceSet.remove(this);
             Ruby runtime = null;
             ThreadContext ctx = null;
             Reaper r = head;
-            
+
             while (r != null) {
                 if (!r.released && !r.unmanaged) {
                     if (r.getRuntime() != runtime) {
@@ -233,7 +233,7 @@ public class AutoPointer extends Pointer {
                 }
                 r = r.next;
             }
-        } 
+        }
     }
 
     private static final class Reaper {
@@ -250,11 +250,11 @@ public class AutoPointer extends Pointer {
             this.proc = proc;
             this.callSite = callSite;
         }
-        
+
         final Ruby getRuntime() {
             return proc.getRuntime();
         }
-        
+
         void dispose(ThreadContext context) {
             callSite.call(context, proc, proc, pointer);
         }

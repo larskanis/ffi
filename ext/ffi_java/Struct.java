@@ -1,5 +1,5 @@
 
-package org.jruby.ext.ffi;
+package ffi;
 
 import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
@@ -21,7 +21,7 @@ public class Struct extends MemoryObject implements StructLayout.Storage {
     private AbstractMemory memory;
     private volatile Object[] referenceCache;
     private volatile IRubyObject[] valueCache;
-    
+
     private static final class Allocator implements ObjectAllocator {
         public final IRubyObject allocate(Ruby runtime, RubyClass klass) {
             return new Struct(runtime, klass);
@@ -35,7 +35,7 @@ public class Struct extends MemoryObject implements StructLayout.Storage {
      * @return The new class
      */
     public static RubyClass createStructClass(Ruby runtime, RubyModule module) {
-        
+
         RubyClass structClass = runtime.defineClassUnder("Struct", runtime.getObject(),
                 Options.REIFY_FFI.load() ? new ReifyingAllocator(Struct.class): Allocator.INSTANCE, module);
         structClass.defineAnnotatedMethods(Struct.class);
@@ -47,7 +47,7 @@ public class Struct extends MemoryObject implements StructLayout.Storage {
                 return obj instanceof Struct && super.isKindOf(obj, type);
             }
         };
-        
+
         return structClass;
     }
 
@@ -95,7 +95,7 @@ public class Struct extends MemoryObject implements StructLayout.Storage {
     static final int getStructSize(Ruby runtime, IRubyObject structClass) {
         return getStructLayout(runtime, structClass).getSize();
     }
-    
+
     static final StructLayout getStructLayout(Ruby runtime, IRubyObject structClass) {
         try {
             Object layout = ((RubyClass) structClass).getFFIHandle();
@@ -134,7 +134,7 @@ public class Struct extends MemoryObject implements StructLayout.Storage {
 
     @JRubyMethod(name = "initialize", visibility = PRIVATE)
     public IRubyObject initialize(ThreadContext context, IRubyObject ptr) {
-        
+
         if (!(ptr instanceof AbstractMemory)) {
             if (ptr.isNil()) {
                 return initialize(context);
@@ -151,7 +151,7 @@ public class Struct extends MemoryObject implements StructLayout.Storage {
 
         memory = (AbstractMemory) ptr;
         setMemoryIO(memory.getMemoryIO());
-        
+
         return this;
     }
 
@@ -306,7 +306,7 @@ public class Struct extends MemoryObject implements StructLayout.Storage {
     public IRubyObject pointer(ThreadContext context) {
         return getMemory();
     }
-    
+
     @JRubyMethod(name = "members")
     public IRubyObject members(ThreadContext context) {
         return layout.members(context);
@@ -409,7 +409,7 @@ public class Struct extends MemoryObject implements StructLayout.Storage {
         referenceCacheUpdater.compareAndSet(this, null, new Object[layout.getReferenceFieldCount()]);
         return referenceCache;
     }
-    
+
     public void putReference(StructLayout.Member member, Object value) {
         getReferenceCache()[layout.getReferenceFieldIndex(member)] = value;
     }

@@ -1,4 +1,4 @@
-package org.jruby.ext.ffi;
+package ffi;
 
 import org.jruby.*;
 import org.jruby.internal.runtime.methods.DynamicMethod;
@@ -12,6 +12,19 @@ import java.util.WeakHashMap;
  * The holder of all per-ruby-runtime FFI data
  */
 public class FFI {
+
+    /**
+     * TODO: Make FFI.set and FFI.get dependent on the runtime.
+     */
+    public static void set(Ruby runtime, FFI f) {
+      ffi = f;
+    }
+    public static FFI get(Ruby runtime) {
+      return ffi;
+    }
+    private static FFI ffi;
+
+
     public final RubyModule ffiModule;
     public final RubyClass memoryClass, bufferClass, pointerClass, memptrClass;
     public final RubyClass structClass, functionClass, callbackClass;
@@ -20,14 +33,13 @@ public class FFI {
     public final Pointer nullPointer;
     private final NullMemoryIO nullMemoryIO;
     private final TypeResolver typeResolver;
-    
+
     /**
      * Reference map to keep libraries open for as long as there is a method mapped
      * to that library.
      */
     private final Map<DynamicMethod, AbstractInvoker> refmap
             = Collections.synchronizedMap(new WeakHashMap<DynamicMethod, AbstractInvoker>());
-
 
     public FFI(RubyModule ffiModule) {
         this.ffiModule = ffiModule;

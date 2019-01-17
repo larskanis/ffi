@@ -1,4 +1,4 @@
-package org.jruby.ext.ffi;
+package ffi;
 
 import org.jruby.Ruby;
 

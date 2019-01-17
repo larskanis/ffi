@@ -1,5 +1,5 @@
 
-package org.jruby.ext.ffi;
+package ffi;
 
 
 import org.jruby.*;
@@ -16,7 +16,7 @@ import static org.jruby.runtime.Visibility.PRIVATE;
 
 @JRubyClass(name = "FFI::MemoryPointer", parent = "FFI::Pointer")
 public class MemoryPointer extends Pointer {
-    
+
     public static RubyClass createMemoryPointerClass(Ruby runtime, RubyModule module) {
         RubyClass memptrClass = module.defineClassUnder("MemoryPointer",
                 module.getClass("Pointer"),
@@ -65,7 +65,7 @@ public class MemoryPointer extends Pointer {
             throw RaiseException.from(runtime, runtime.getNoMemoryError(),
                     String.format("Failed to allocate %d objects of %d bytes", typeSize, count));
         }
-        
+
         if (block.isGiven()) {
             try {
                 return block.yield(context, this);
@@ -105,18 +105,18 @@ public class MemoryPointer extends Pointer {
                     RubyFixnum.fix2int(sizeArg), 1, true, block)
                 : init(context, sizeArg, 1, 1, true, block);
     }
-    
+
     @JRubyMethod(name = { "initialize" }, visibility = PRIVATE)
     public final IRubyObject initialize(ThreadContext context, IRubyObject sizeArg, IRubyObject count, Block block) {
         return init(context, sizeArg, RubyNumeric.fix2int(count), 1, true, block);
     }
-    
+
     @JRubyMethod(name = { "initialize" }, visibility = PRIVATE)
     public final IRubyObject initialize(ThreadContext context,
             IRubyObject sizeArg, IRubyObject count, IRubyObject clear, Block block) {
         return init(context, sizeArg, RubyNumeric.fix2int(count), 1, clear.isTrue(), block);
     }
-    
+
     @Override
     public final String toString() {
         return String.format("MemoryPointer[address=%#x, size=%d]", getAddress(), size);
@@ -130,7 +130,7 @@ public class MemoryPointer extends Pointer {
                 && ((MemoryPointer) obj).getAddress() == getAddress())
                 && ((MemoryPointer) obj).getSize() == getSize());
     }
-    
+
     @JRubyMethod(name = "free")
     public final IRubyObject free(ThreadContext context) {
         ((AllocatedDirectMemoryIO) getMemoryIO()).free();

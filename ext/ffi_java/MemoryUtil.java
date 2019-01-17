@@ -1,4 +1,4 @@
-package org.jruby.ext.ffi;
+package ffi;
 
 import org.jruby.Ruby;
 import org.jruby.RubyArray;
@@ -13,7 +13,7 @@ public final class MemoryUtil {
 
         byte[] array = new byte[count];
         io.get(offset, array, 0, array.length);
-        
+
         RubyArray arr = RubyArray.newArray(runtime, array.length);
         for (int i = 0; i < array.length; ++i) {
             arr.add(Util.newSigned8(runtime, array[i]));
@@ -67,7 +67,7 @@ public final class MemoryUtil {
 
         return arr;
     }
-    
+
     public static final void putArrayOfSigned16(Ruby runtime, MemoryIO io, long offset, RubyArray ary) {
 
         short[] array = new short[ary.size()];
@@ -123,7 +123,7 @@ public final class MemoryUtil {
 
         io.put(offset, array, 0, array.length);
     }
-    
+
     public static final IRubyObject getArrayOfUnsigned32(Ruby runtime, MemoryIO io, long offset, int count) {
 
         int[] array = new int[count];
