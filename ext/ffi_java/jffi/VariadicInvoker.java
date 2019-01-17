@@ -13,6 +13,7 @@ import org.jruby.RubyObject;
 import org.jruby.anno.JRubyClass;
 import org.jruby.anno.JRubyMethod;
 import ffi.Enums;
+import ffi.FFI;
 import ffi.NativeType;
 import ffi.Pointer;
 import ffi.Type;
@@ -106,7 +107,7 @@ public class VariadicInvoker extends RubyObject {
         }
 
         if (!(args[2] instanceof Pointer)) {
-            throw context.runtime.newTypeError(args[2], context.runtime.getFFI().pointerClass);
+            throw context.runtime.newTypeError(args[2], FFI.get(context.runtime).pointerClass);
         }
         final Pointer address = (Pointer) args[2];
 

@@ -100,7 +100,7 @@ public abstract class Type extends RubyObject {
     }
 
     public static final RubyClass getTypeClass(Ruby runtime) {
-        return runtime.getFFI().typeClass;
+        return FFI.get(runtime).typeClass;
     }
 
     /**

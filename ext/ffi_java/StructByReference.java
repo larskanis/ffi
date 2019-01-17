@@ -39,7 +39,7 @@ public final class StructByReference extends RubyObject {
                     + structClass.getMetaClass().getName() + " (expected Class)");
         }
 
-        if (!((RubyClass) structClass).isKindOfModule(context.runtime.getFFI().structClass)) {
+        if (!((RubyClass) structClass).isKindOfModule(FFI.get(context.runtime).structClass)) {
             throw context.runtime.newTypeError("wrong argument type "
                     + structClass.getMetaClass().getName() + " (expected subclass of FFI::Struct)");
         }
@@ -76,7 +76,7 @@ public final class StructByReference extends RubyObject {
 
     @JRubyMethod(name = "native_type")
     public IRubyObject native_type(ThreadContext context) {
-        return context.runtime.getFFI().typeClass.getConstant("POINTER");
+        return FFI.get(context.runtime).typeClass.getConstant("POINTER");
     }
 
 
@@ -102,7 +102,7 @@ public final class StructByReference extends RubyObject {
             return getStructClass().newInstance(context, Pointer.getNull(context.runtime), Block.NULL_BLOCK);
 
         } else {
-            throw context.runtime.newTypeError(value, context.runtime.getFFI().pointerClass);
+            throw context.runtime.newTypeError(value, FFI.get(context.runtime).pointerClass);
         }
     }
 

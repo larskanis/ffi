@@ -569,7 +569,7 @@ public final class JITRuntime {
         }
 
         throw parameter.getRuntime().newTypeError(parameter.getMetaClass() + "#" + callSite.getMethodName()
-                + " should return " + context.runtime.getFFI().pointerClass);
+                + " should return " + FFI.get(context.runtime).pointerClass);
     }
 
     public static DynamicMethod getConversionMethod(IRubyObject parameter, CachingCallSite callSite) {

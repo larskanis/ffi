@@ -89,7 +89,7 @@ public final class Enums extends RubyObject {
     @JRubyMethod(name = "<<")
     public IRubyObject append(final ThreadContext context, IRubyObject item){
         if(!(item instanceof Enum)){
-            throw context.runtime.newTypeError(item, context.runtime.getFFI().ffiModule.getClass("Enum"));
+            throw context.runtime.newTypeError(item, FFI.get(context.runtime).ffiModule.getClass("Enum"));
         }
         allEnums.append(item);
         if (!(item == null || item == context.nil)){

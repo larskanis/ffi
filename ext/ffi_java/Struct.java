@@ -57,7 +57,7 @@ public class Struct extends MemoryObject implements StructLayout.Storage {
      * @param runtime The runtime for the <tt>StructLayout</tt>
      */
     Struct(Ruby runtime) {
-        this(runtime, runtime.getFFI().structClass);
+        this(runtime, FFI.get(runtime).structClass);
     }
 
     /**
@@ -89,7 +89,7 @@ public class Struct extends MemoryObject implements StructLayout.Storage {
     }
 
     static final boolean isStruct(Ruby runtime, RubyClass klass) {
-        return klass.isKindOfModule(runtime.getFFI().structClass);
+        return klass.isKindOfModule(FFI.get(runtime).structClass);
     }
 
     static final int getStructSize(Ruby runtime, IRubyObject structClass) {

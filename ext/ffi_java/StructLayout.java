@@ -314,7 +314,7 @@ public final class StructLayout extends Type {
 
     final IRubyObject getValue(ThreadContext context, IRubyObject name, Storage cache, IRubyObject ptr) {
         if (!(ptr instanceof AbstractMemory)) {
-            throw context.runtime.newTypeError(ptr, context.runtime.getFFI().memoryClass);
+            throw context.runtime.newTypeError(ptr, FFI.get(context.runtime).memoryClass);
         }
 
         return getMember(context.runtime, name).get(context, cache, (AbstractMemory) ptr);
@@ -322,7 +322,7 @@ public final class StructLayout extends Type {
 
     final void putValue(ThreadContext context, IRubyObject name, Storage cache, IRubyObject ptr, IRubyObject value) {
         if (!(ptr instanceof AbstractMemory)) {
-            throw context.runtime.newTypeError(ptr, context.runtime.getFFI().memoryClass);
+            throw context.runtime.newTypeError(ptr, FFI.get(context.runtime).memoryClass);
         }
 
         getMember(context.runtime, name).put(context, cache, (AbstractMemory) ptr, value);
@@ -1269,7 +1269,7 @@ public final class StructLayout extends Type {
 
         public void put(ThreadContext context, StructLayout.Storage cache, Member m, AbstractMemory ptr, IRubyObject value) {
             if (!(value instanceof Struct)) {
-                throw context.runtime.newTypeError(value, context.runtime.getFFI().structClass);
+                throw context.runtime.newTypeError(value, FFI.get(context.runtime).structClass);
             }
 
             Struct s = (Struct) value;

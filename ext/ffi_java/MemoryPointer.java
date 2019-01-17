@@ -86,7 +86,7 @@ public class MemoryPointer extends Pointer {
                     String.format("Failed to allocate %d objects of %d bytes", count, typeSize));
         }
 
-        return new MemoryPointer(runtime, runtime.getFFI().memptrClass, io, total, typeSize);
+        return new MemoryPointer(runtime, FFI.get(runtime).memptrClass, io, total, typeSize);
     }
 
     @JRubyMethod(name = "from_string", meta = true)
