@@ -32,73 +32,128 @@
 #
 
 require 'ffi/platform'
+require 'ffi/struct_layout'
 require 'ffi/struct_layout_builder'
+require 'ffi/struct_by_reference'
 
 module FFI
 
-  class StructLayout
-
-    # @return [Array<Array(Symbol, Numeric)>
-    # Get an array of tuples (field name, offset of the field).
-    def offsets
-      members.map { |m| [ m, self[m].offset ] }
-    end
-
-    # @return [Numeric]
-    # Get the offset of a field.
-    def offset_of(field_name)
-      self[field_name].offset
-    end
-
-    # An enum {Field} in a {StructLayout}.
-    class Enum < Field
-
-      # @param [AbstractMemory] ptr pointer on a {Struct}
-      # @return [Object]
-      # Get an object of type {#type} from memory pointed by +ptr+.
-      def get(ptr)
-        type.find(ptr.get_int(offset))
-      end
-
-      # @param [AbstractMemory] ptr pointer on a {Struct}
-      # @param  value
-      # @return [nil]
-      # Set +value+ into memory pointed by +ptr+.
-      def put(ptr, value)
-        ptr.put_int(offset, type.find(value))
-      end
-
-    end
-
-    class InnerStruct < Field
-      def get(ptr)
-        type.struct_class.new(ptr.slice(self.offset, self.size))
-      end
-
-     def put(ptr, value)
-       raise TypeError, "wrong value type (expected #{type.struct_class})" unless value.is_a?(type.struct_class)
-       ptr.slice(self.offset, self.size).__copy_from__(value.pointer, self.size)
-     end
-    end
-
-    class Mapped < Field
-      def initialize(name, offset, type, orig_field)
-        super(name, offset, type)
-        @orig_field = orig_field
-      end
-
-      def get(ptr)
-        type.from_native(@orig_field.get(ptr), nil)
-      end
-
-      def put(ptr, value)
-        @orig_field.put(ptr, type.to_native(value, nil))
-      end
-    end
-  end
-
-  
+  # A FFI::Struct means to mirror a C struct.
+  #
+  # A Struct is defined as:
+  #  class MyStruct < FFI::Struct
+  #    layout :value1, :int,
+  #           :value2, :double
+  #  end
+  # and is used as:
+  #  my_struct = MyStruct.new
+  #  my_struct[:value1] = 12
+  #
+  # For more information, see http://github.com/ffi/ffi/wiki/Structs
   class Struct
+
+    attr_reader :pointer, :layout
+
+    # @param [AbstractMemory] pointer
+    # @param [Array] args
+    # @return [self]
+    def initialize(pointer = nil, *args)
+      if args.empty?
+        @layout = self.class.instance_variable_get(:@layout)
+      else
+        @layout = self.class.layout(*args)
+      end
+      unless FFI::StructLayout === @layout
+        raise RuntimeError, "invalid Struct layout for #{self.class}"
+      end
+
+      if pointer
+        unless FFI::AbstractMemory === pointer
+          raise ArgumentError, "Invalid Memory object"
+        end
+        @pointer = pointer
+      else
+        @pointer = MemoryPointer.new(@layout.size, 1, true)
+      end
+
+      initialize_backend(@layout, @pointer)
+    end
+
+    def initialize_copy(other)
+      return self if equal?(other)
+
+      @layout = other.layout
+
+      # A new MemoryPointer instance is allocated here instead of just calling
+      # #dup on rbPointer, since the Pointer may not know its length, or may
+      # be longer than just this struct.
+      if other.pointer
+        @pointer = MemoryPointer.new(@layout.size, 1, false)
+        @pointer.__copy_from__(other.pointer, @layout.size)
+      else
+        @pointer = other.pointer
+      end
+      initialize_backend(@layout, @pointer)
+      initialize_copy_backend(other)
+    end
+
+    # @param [AbstractMemory] pointer
+    # @return [self]
+    # Make Struct point to +pointer+.
+    def pointer=(pointer)
+      unless FFI::AbstractMemory === pointer
+        raise TypeError, "wrong argument type #{pointer.class} (expected Pointer or Buffer)"
+      end
+
+      layout = get_layout
+      if layout.size > pointer.size
+        raise ArgumentError, "memory of #{pointer.size} bytes too small for struct" +
+                             " #{self.class} (expected at least #{@layout.size})"
+      end
+
+      @pointer = pointer
+      initialize_backend(@layout, @pointer)
+    end
+    private :pointer=
+
+    # @param [StructLayout] layout
+    # @return [self]
+    # Set the Struct's layout.
+    def layout=(layout)
+      unless FFI::StructLayout === layout
+        raise TypeError, "wrong argument type #{layout.class} (expected #{FFI::StructLayout})"
+      end
+      @layout = layout
+      initialize_backend(@layout, @pointer)
+    end
+    private :layout=
+
+    # (see Pointer#order)
+    def order(*args)
+      if args.empty?
+        @pointer.order
+      else
+        copy = dup
+        pointer = @pointer.order(*args)
+        self.pointer = pointer
+        copy
+      end
+    end
+
+    def get_layout
+      if defined?(@layout)
+        @layout
+      else
+        layout = self.class.instance_variable_get(:@layout)
+        unless FFI::StructLayout === layout
+          raise RuntimeError, "invalid Struct layout for #{self.class}"
+        end
+        @layout = layout
+        initialize_backend(@layout, @pointer)
+        layout
+      end
+    end
+    private :get_layout
 
     # Get struct size
     # @return [Numeric]
@@ -296,7 +351,7 @@ module FFI
         @packed = packed
       end
       alias :pack :packed
-      
+
       def aligned(alignment = 1)
         @min_alignment = alignment
       end

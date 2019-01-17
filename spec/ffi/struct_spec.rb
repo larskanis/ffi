@@ -203,6 +203,23 @@ describe "Struct tests" do
     expect(s[:b]).to eq(0xdeadcafebabe)
   end
 
+  it "verifies the allocated memory is large enough for #pointer=" do
+    class SetPointerStruct < FFI::Struct
+      layout :a, :long, :b, :long, :c, :long
+    end
+
+    struct = SetPointerStruct.new
+    ptr = FFI::MemoryPointer.new(:int, 1)
+    expect {
+      struct.send(:pointer=, ptr)
+    }.to raise_error(ArgumentError, "memory of 4 bytes too small for struct SetPointerStruct (expected at least 24)")
+
+    ptr = FFI::MemoryPointer.new(:long, 3)
+    struct.send(:pointer=, ptr)
+    ptr.write_long(0x01020304)
+    expect(struct[:a]).to eq 0x01020304
+  end
+
   it "Can use Struct subclass as parameter type" do
     expect(module StructParam
       extend FFI::Library

@@ -6,6 +6,7 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#define sleep(x) Sleep((x)*1000)
 #endif
 
 #ifndef _WIN32
@@ -26,6 +27,10 @@ int testFunctionAdd(int a, int b, int (*f)(int, int))
 {
     return f(a, b);
 };
+
+void testBlocking(int seconds) {
+    sleep(seconds);
+}
 
 struct testBlockingData {
     FD_TYPE pipe1[2];

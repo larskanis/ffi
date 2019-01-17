@@ -88,7 +88,6 @@ extern "C" {
         AbstractMemory* pointer;
         VALUE* rbReferences;
 
-        VALUE rbLayout;
         VALUE rbPointer;
     };
 
@@ -103,4 +102,3 @@ extern "C" {
 #endif
 
 #endif	/* RBFFI_STRUCT_H */
-

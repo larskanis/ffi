@@ -43,7 +43,6 @@ typedef struct MappedType_ {
     Type* type;
     VALUE rbConverter;
     VALUE rbType;
-    
 } MappedType;
 
 void rbffi_MappedType_Init(VALUE moduleFFI);
@@ -56,4 +55,3 @@ extern VALUE rbffi_MappedTypeClass;
 #endif
 
 #endif	/* RBFFI_MAPPEDTYPE_H */
-

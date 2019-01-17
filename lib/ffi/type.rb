@@ -1,5 +1,6 @@
 #
-# Copyright (C) 2008-2010 JRuby project
+# Copyright (C) 2008-2010 Wayne Meissner
+# Copyright (c) 2007, 2008 Evan Phoenix
 #
 # This file is part of ruby-ffi.
 #
@@ -27,19 +28,46 @@
 # CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
 
-require 'ffi/platform'
-require 'ffi/data_converter'
-require 'ffi/types'
-require 'ffi/library'
-require 'ffi/errno'
-require 'ffi/pointer'
-require 'ffi/memorypointer'
-require 'ffi/struct'
-require 'ffi/union'
-require 'ffi/managedstruct'
-require 'ffi/callback'
-require 'ffi/io'
-require 'ffi/autopointer'
-require 'ffi/variadic'
-require 'ffi/enum'
+module FFI
+
+  class Type
+
+    class Mapped < Type
+      attr_reader :native_type
+      alias :type :native_type
+
+      # @param [#native_type, #to_native, #from_native] converter +converter+ must respond to
+      #  all these methods
+      def initialize(converter)
+        %i[native_type to_native from_native].each do |meth|
+          unless converter.respond_to?(meth)
+            raise NoMethodError, "#{meth} method not implemented for #{converter}"
+          end
+        end
+
+        @native_type = converter.native_type
+        unless @native_type.kind_of?(FFI::Type)
+          raise TypeError, 'native_type did not return instance of FFI::Type'
+        end
+
+        @converter = converter
+
+        initialize_backend(@converter, @native_type)
+      end
+
+      # @param args depends on {FFI::DataConverter} used to initialize +self+
+      def to_native(*args)
+        @converter.to_native(*args)
+      end
+
+      # @param args depends on {FFI::DataConverter} used to initialize +self+
+      def from_native(*args)
+        @converter.from_native(*args)
+      end
+    end
+
+  end
+
+end
