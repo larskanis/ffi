@@ -125,57 +125,26 @@ public class Struct extends MemoryObject implements StructLayout.Storage {
         }
     }
 
-    @Override
-    @JRubyMethod(name = "initialize", visibility = PRIVATE)
-    public IRubyObject initialize(ThreadContext context) {
-        memory = MemoryPointer.allocate(context.runtime, layout.getSize(), 1, true);
-        return this;
-    }
-
-    @JRubyMethod(name = "initialize", visibility = PRIVATE)
-    public IRubyObject initialize(ThreadContext context, IRubyObject ptr) {
-
-        if (!(ptr instanceof AbstractMemory)) {
-            if (ptr.isNil()) {
-                return initialize(context);
-            }
-
-            throw context.runtime.newTypeError("wrong argument type "
-                    + ptr.getMetaClass().getName() + " (expected Pointer or Buffer)");
+    @JRubyMethod(name = "initialize_backend", visibility = PRIVATE)
+    public IRubyObject initialize_backend(ThreadContext context, IRubyObject rbLayout, IRubyObject rbPointer) {
+        if (!(rbLayout instanceof StructLayout)) {
+            throw context.runtime.newTypeError("Struct.layout did not return a FFI::StructLayout instance");
         }
+        layout = (StructLayout) rbLayout;
 
-        if (((AbstractMemory) ptr).getSize() < layout.getSize()) {
+        if (((AbstractMemory) rbPointer).getSize() < layout.getSize()) {
             throw context.runtime.newArgumentError("memory object has insufficient space for "
                     + getMetaClass().getName());
         }
 
-        memory = (AbstractMemory) ptr;
+        memory = (AbstractMemory) rbPointer;
         setMemoryIO(memory.getMemoryIO());
 
         return this;
     }
 
-    @JRubyMethod(name = "initialize", visibility = PRIVATE, rest = true)
-    public IRubyObject initialize(ThreadContext context, IRubyObject[] args) {
-        switch (args.length) {
-            default: // > 1
-                IRubyObject result = getMetaClass().callMethod(context, "layout", args[1] instanceof RubyArray
-                        ? ((RubyArray) args[1]).toJavaArrayUnsafe()
-                        : java.util.Arrays.copyOfRange(args, 1, args.length));
-                if (!(result instanceof StructLayout)) {
-                    throw context.runtime.newTypeError("Struct.layout did not return a FFI::StructLayout instance");
-                }
-                layout = (StructLayout) result;
-            case 1: return initialize(context, args[0]);
-            case 0: return initialize(context);
-        }
-    }
-
-    @JRubyMethod(name = "initialize_copy", visibility = PRIVATE)
-    public IRubyObject initialize_copy(ThreadContext context, IRubyObject other) {
-        if (other == this) {
-            return this;
-        }
+    @JRubyMethod(name = "initialize_copy_backend", visibility = PRIVATE)
+    public IRubyObject initialize_copy_backend(ThreadContext context, IRubyObject other) {
         if (!(other instanceof Struct)) {
             throw context.runtime.newTypeError("not an instance of Struct");
         }
