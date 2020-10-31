@@ -27,7 +27,7 @@ module LibTest
   ffi_lib TestLibrary::PATH
 end
 
-def external_run(cmd, rb_file, options: [], timeout: 10)
+def external_run(cmd, rb_file, options: [], timeout: 100)
   path = File.join(File.dirname(__FILE__), rb_file)
   log = "#{path}.log"
   pid = spawn(cmd, "-Ilib", path, { [:out, :err] => log })

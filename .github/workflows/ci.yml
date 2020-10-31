@@ -17,6 +17,8 @@ jobs:
 
     - run: brew install automake libffi pkg-config
       if: matrix.os == 'macos'
+    - run: sudo apt install -y valgrind
+      if: matrix.os == 'ubuntu'
     - run: ridk exec pacman --sync --refresh --needed --noconfirm  mingw-w64-x86_64-libffi
       if: matrix.os == 'windows' && matrix.extconfopts == '--enable-system-libffi'
 
@@ -26,7 +28,9 @@ jobs:
       env:
         # work around misconfiguration of libffi on MacOS with homebrew
         PKG_CONFIG_PATH: ${{ env.PKG_CONFIG_PATH }}:/usr/local/opt/libffi/lib/pkgconfig
-    - run: bundle exec rake test
+    - run: ruby -Ilib spec/ffi/fixtures/compile.rb
+    - run: bundle exec valgrind --trace-children=yes rake test
+    #    - run: bundle exec rake test
     - run: bundle exec rake types_conf && git --no-pager diff
 
   specs:
