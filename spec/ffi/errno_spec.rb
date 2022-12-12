@@ -21,12 +21,12 @@ describe "FFI.errno" do
     # cases
     case FFI::Platform::OS
       when "cygwin"
-        expect(FFI::LastError.winapi_error).to eq(0x12345678)
         LibTest.setErrno(0x2A)
         expect(FFI.errno).to eq(0x2A)
-      when "windows"
         expect(FFI::LastError.winapi_error).to eq(0x12345678)
+      when "windows"
         expect(FFI.errno).to eq(0x12345678)
+        expect(FFI::LastError.winapi_error).to eq(0x12345678)
       else
         # Linux, and else
         expect {FFI::LastError.winapi_error}.to raise_exception(NoMethodError)
