@@ -45,7 +45,7 @@ module FFI
 
         libnames = (name.is_a?(::Array) ? name : [name])
         libnames = libnames.map(&:to_s).map { |n| [n, FFI.map_library_name(n)].uniq }.flatten.compact
-        errors = []
+        errors = {}
 
         libnames.each do |libname|
           lib = try_load(libname, flags, errors)
@@ -62,12 +62,13 @@ module FFI
           end
         end
 
-        raise LoadError, [*errors, SEARCH_PATH_MESSAGE].join(".\n")
+        raise LoadError, [*errors.values, SEARCH_PATH_MESSAGE].join(".\n")
       end
     end
     private_class_method :load_library
 
     def self.try_load(libname, flags, errors)
+      orig = libname
       begin
         lib = FFI::DynamicLibrary.open(libname, flags)
         return lib if lib
@@ -76,11 +77,13 @@ module FFI
       rescue LoadError, RuntimeError => ex
         if ex.message =~ /(([^ \t()])+\.so([^ \t:()])*):([ \t])*(invalid ELF header|file too short|invalid file format)/
           if File.binread($1) =~ /(?:GROUP|INPUT) *\( *([^ \)]+)/
-            return try_load($1, flags, errors)
+            libname = $1
+            retry
           end
         end
 
-        errors << ex
+        libr = (orig == libname ? orig : "#{orig} #{libname}")
+        errors[libr] = ex
         nil
       end
     end
