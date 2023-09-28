@@ -4,7 +4,31 @@ permissions:
   contents: read
 
 jobs:
+  job_build_gem:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+
+      - run: bundle install
+      - name: Download libffi
+        run: bundle exec rake libffi
+      - name: Build source gem
+        run: bundle exec rake gem
+
+      - name: Upload source gem
+        uses: actions/upload-artifact@v3
+        with:
+          name: source-gem
+          path: "pkg/*.gem"
+
   system-libffi:
+    name: libffi
+    needs: job_build_gem
     # Run on latest MRI with explicit selection of system or builtin libffi
     strategy:
       fail-fast: false
@@ -19,6 +43,11 @@ jobs:
       with:
         ruby-version: 2.7
 
+    - name: Download gem from build job
+      uses: actions/download-artifact@v3
+      with:
+        name: source-gem
+
     - if: matrix.os == 'macos'
       run: brew install automake libffi pkg-config
 
@@ -27,12 +56,11 @@ jobs:
       run: ridk exec sh -c "pacman --sync --refresh --needed --noconfirm  ${MINGW_PACKAGE_PREFIX}-libffi"
 
     - run: bundle install
-    - run: bundle exec rake libffi
-    - run: bundle exec rake compile -- ${{ matrix.extconfopts }} ${{ matrix.extconfopts2 }}
-      env:
-        # work around misconfiguration of libffi on MacOS with homebrew
-        PKG_CONFIG_PATH: ${{ env.PKG_CONFIG_PATH }}:/usr/local/opt/libffi/lib/pkgconfig
-    - run: bundle exec rake test FFI_TEST_GC=true
+    - run: gem install --local *.gem --verbose -- ${{ matrix.extconfopts }} ${{ matrix.extconfopts2 }}
+      # env:
+      #   # work around misconfiguration of libffi on MacOS with homebrew
+      #   PKG_CONFIG_PATH: ${{ env.PKG_CONFIG_PATH }}:/usr/local/opt/libffi/lib/pkgconfig
+    - run: ruby -rffi -S rake test FFI_TEST_GC=true
     - run: bundle exec rake types_conf && git --no-pager diff
 
   specs:
@@ -62,6 +90,8 @@ jobs:
 
     - if: matrix.os != 'windows'
       run: bundle exec rake test FFI_TEST_GC=true
+    - if: matrix.os == 'windows'
+      run: bundle exec rake test
 
     - run: bundle exec rake bench:all
       if: ${{ matrix.ruby != 'truffleruby-head' && matrix.ruby != 'jruby-head' }}
