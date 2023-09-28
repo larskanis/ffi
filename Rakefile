@@ -85,9 +85,11 @@ task 'gem:java' => 'java:gem'
 
 FfiGemHelper.install_tasks
 # Register windows gems to be pushed to rubygems.org
-Bundler::GemHelper.instance.cross_platforms = %w[x86-mingw32 x64-mingw-ucrt x64-mingw32]
-# These platforms are not yet enabled, since there are issues on musl-based distors (alpine-linux):
-# + %w[x86-linux x86_64-linux arm-linux aarch64-linux x86_64-darwin arm64-darwin]
+cross_platforms = %w[x86-mingw32 x64-mingw-ucrt x64-mingw32] +
+# These platforms are not yet released, since there are issues on musl-based distors (alpine-linux):
+  %w[x86-linux x86_64-linux arm-linux aarch64-linux x86_64-darwin arm64-darwin]
+
+Bundler::GemHelper.instance.cross_platforms = cross_platforms[0, 3]
 
 if RUBY_ENGINE == 'ruby' || RUBY_ENGINE == 'rbx'
   require 'rake/extensiontask'
@@ -96,7 +98,7 @@ if RUBY_ENGINE == 'ruby' || RUBY_ENGINE == 'rbx'
     # ext.lib_dir = BUILD_DIR                                 # put binaries into this folder.
     ext.tmp_dir = BUILD_DIR                                   # temporary folder used during compilation.
     ext.cross_compile = true                                  # enable cross compilation (requires cross compile toolchain)
-    ext.cross_platform = Bundler::GemHelper.instance.cross_platforms
+    ext.cross_platform = cross_platforms
     ext.cross_compiling do |spec|
       spec.files.reject! { |path| File.fnmatch?('ext/*', path) }
     end
@@ -114,10 +116,10 @@ end
 namespace "gem" do
   task 'prepare' do
     require 'rake_compiler_dock'
-    sh "bundle package --all"
+    sh "bundle package"
   end
 
-  Bundler::GemHelper.instance.cross_platforms.each do |plat|
+  cross_platforms.each do |plat|
     desc "Build all native binary gems in parallel"
     multitask 'native' => plat
 
